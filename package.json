@@ -1,6 +1,6 @@
 {
   "name": "code-review-gpt",
-  "version": "0.8.0",
+  "version": "0.8.1:beta",
   "description": "Your AI code reviewer. Improve code quality and catch bugs before you break production",
   "bin": {
     "code-review-gpt": "./dist/index.js"
@@ -22,8 +22,7 @@
     "publish:build": "bun run build && bun publish --access public",
     "check": "biome check .",
     "check:fix": "biome check . --fix",
-    "format": "biome format --write .",
-    "prepare": "bun run ./scripts/build.ts"
+    "format": "biome format --write ."
   },
   "keywords": [
     "code-review",
