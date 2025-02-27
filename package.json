@@ -23,7 +23,7 @@
     "check": "biome check .",
     "check:fix": "biome check . --fix",
     "format": "biome format --write .",
-    "prepare": "npm run build"
+    "prepare": "bun run ./scripts/build.ts"
   },
   "keywords": [
     "code-review",
