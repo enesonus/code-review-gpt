@@ -22,7 +22,8 @@
     "publish:build": "bun run build && bun publish --access public",
     "check": "biome check .",
     "check:fix": "biome check . --fix",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "prepare": "npm run build"
   },
   "keywords": [
     "code-review",
