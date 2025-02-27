@@ -20,10 +20,10 @@ export class AIModel {
     switch (options.provider) {
       case 'openai':
         this.model = new ChatOpenAI({
+          modelName: options.modelName,
           apiKey: options.apiKey,
           ...(options.organization && { organization: options.organization }),
-          temperature: options.temperature,
-          modelName: options.modelName,
+          temperature: options.modelName.startsWith('o') ? undefined : options.temperature,
         });
         break;
       case "azureai":
