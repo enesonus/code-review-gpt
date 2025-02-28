@@ -2,6 +2,7 @@ import { commentOnPR as commentOnPRAzdev } from '../common/ci/azdev/commentOnPR'
 import { commentOnPR as commentOnPRGithub } from '../common/ci/github/commentOnPR';
 import { commentPerFile } from '../common/ci/github/commentPerFile';
 import { commentOnPR as commentOnPRGitlab } from '../common/ci/gitlab/commentOnPR';
+import { sendSlackMessage } from '../common/ci/gitlab/sendSlackMessage';
 import { getMaxPromptLength } from '../common/model/getMaxPromptLength';
 import { PlatformOptions, type ReviewArgs, type ReviewFile } from '../common/types';
 import { logger } from '../common/utils/logger';
@@ -69,6 +70,7 @@ export const review = async (
   }
   if (isCi === PlatformOptions.GITLAB) {
     await commentOnPRGitlab(response, signOff);
+    await sendSlackMessage(response, signOff);
   }
 
   if (isCi === PlatformOptions.AZDEV) {
