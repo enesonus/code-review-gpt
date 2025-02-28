@@ -30,7 +30,7 @@ export const sendSlackMessage = async (
 			host: gitlabHost,
 		});
 
-        const test = api.Commits.show(projectId, gitlabSha);
+        const test = await api.Commits.show(projectId, gitlabSha);
 
         console.log(`test: ${JSON.stringify(test)}`);
         process.stdout.write(`test: ${JSON.stringify(test)}\n`);
