@@ -77,7 +77,7 @@ export const markdownReport = (
 	switch (reviewChannel) {
 		case "ci":
 			return `
-  ${feedbacks.map(formatFeedbackSlack).join("\n---\n")}
+  ${feedbacks.map(formatFeedbackCI).join("\n---\n")}
   `;
 		case "slack":
 			const blocks = [];
