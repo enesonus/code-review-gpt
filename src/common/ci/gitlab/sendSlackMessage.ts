@@ -44,18 +44,27 @@ export const sendSlackMessage = async (
         
 		// Add commit link to blocks if it's a blocks message
 		if (typeof comment === 'object' && comment.blocks) {
-			// Add a section with the commit link at the beginning
+			// Add a header with the commit link at the beginning
 			comment.blocks.unshift({
+				type: "header",
+				text: {
+					type: "plain_text",
+					text: `Review for commit: ${gitlabSha.substring(0, 8)}`
+				}
+			});
+			
+			// Add a section with clickable link after the header
+			comment.blocks.splice(1, 0, {
 				type: "section",
 				text: {
 					type: "mrkdwn",
-					text: `*Review for commit:* <${commitUrl}|${gitlabSha.substring(0, 8)}>`
+					text: `<${commitUrl}|View commit on GitLab>`
 				}
 			});
 		}
 		// For string messages, prepend the commit link
 		else if (typeof comment === 'string') {
-			comment = `*Review for commit:* <${commitUrl}|${gitlabSha.substring(0, 8)}>\n\n${comment}`;
+			comment = `*Review for commit: ${gitlabSha.substring(0, 8)}*\n<${commitUrl}|View commit on GitLab>\n\n${comment}`;
 		}
 
 		try {
