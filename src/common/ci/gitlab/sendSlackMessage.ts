@@ -38,6 +38,25 @@ export const sendSlackMessage = async (
 
 		// Get committer email from commit info
 		const committerEmail = commitInfo.committer_email;
+        
+		// Create commit URL
+		const commitUrl = `${gitlabHost}/${projectId}/-/commit/${gitlabSha}`;
+        
+		// Add commit link to blocks if it's a blocks message
+		if (typeof comment === 'object' && comment.blocks) {
+			// Add a section with the commit link at the beginning
+			comment.blocks.unshift({
+				type: "section",
+				text: {
+					type: "mrkdwn",
+					text: `*Review for commit:* <${commitUrl}|${gitlabSha.substring(0, 8)}>`
+				}
+			});
+		}
+		// For string messages, prepend the commit link
+		else if (typeof comment === 'string') {
+			comment = `*Review for commit:* <${commitUrl}|${gitlabSha.substring(0, 8)}>\n\n${comment}`;
+		}
 
 		try {
 			// First lookup the user by email
