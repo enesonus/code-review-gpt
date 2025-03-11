@@ -9,7 +9,8 @@ export const askAI = async (
   modelName: string,
   openAIApiKey: string,
   organization: string | undefined,
-  provider: string
+  provider: string,
+  reviewChannel: string
 ): Promise<AskAIResponse> => {
   logger.info('Asking the experts...');
 
@@ -30,7 +31,7 @@ export const askAI = async (
     };
   }
 
-  const report = markdownReport(feedbacks);
+  const report = markdownReport(feedbacks, reviewChannel);
 
   return {
     markdownReport: report,

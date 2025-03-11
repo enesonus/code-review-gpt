@@ -86,6 +86,12 @@ export const getYargs = async (): Promise<ReviewArgs> => {
       type: 'string',
       default: 'openai',
     })
+    .option('reviewChannel', {
+      description: 'Review channel to send the AI Code Review',
+      choices: ['ci', 'slack'],
+      type: 'string',
+      default: 'ci',
+    })
     .help()
     .parse();
 };

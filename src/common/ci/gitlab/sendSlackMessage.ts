@@ -1,4 +1,5 @@
 import { Gitlab } from "@gitbeaker/rest";
+import axios from "axios";
 
 import { getGitLabEnvVariables } from "../../../config";
 import { logger } from "../../utils/logger";
@@ -10,7 +11,7 @@ import { logger } from "../../utils/logger";
  * @returns
  */
 export const sendSlackMessage = async (
-	comment: string,
+	comment: string | { blocks: any[] },
 	signOff: string
 ): Promise<void> => {
 	try {
@@ -22,20 +23,108 @@ export const sendSlackMessage = async (
 			mergeRequestIIdString,
 			gitlabHost,
 		} = getGitLabEnvVariables();
-
-        console.log(`mergeRequestBaseSha: ${mergeRequestBaseSha}, gitlabToken: ${gitlabToken}, projectId: ${projectId}, gitlabSha: ${gitlabSha}, mergeRequestIIdString: ${mergeRequestIIdString}, gitlabHost: ${gitlabHost}`);
-        process.stdout.write(`mergeRequestBaseSha: ${mergeRequestBaseSha}, gitlabToken: ${gitlabToken}, projectId: ${projectId}, gitlabSha: ${gitlabSha}, mergeRequestIIdString: ${mergeRequestIIdString}, gitlabHost: ${gitlabHost}\n`);
+		logger.info("Sending Slack message");
 		const api = new Gitlab({
-			token: gitlabToken,
-			host: gitlabHost,
+			token: process.env.GITLAB_TOKEN ?? "",
+			host: process.env.GITLAB_HOST ?? "https://gitlab.com",
 		});
 
-        const test = await api.Commits.show(projectId, gitlabSha);
+		const commitInfo = await api.Commits.show(
+			// "43058895",
+			// "7526a0096c5ca0b151425a1563eb05ac8f1302ca"
+			projectId,
+			gitlabSha
+		);
 
-        console.log(`test: ${JSON.stringify(test)}`);
-        process.stdout.write(`test: ${JSON.stringify(test)}\n`);
+		// Get committer email from commit info
+		const committerEmail = commitInfo.committer_email;
+
+		try {
+			// First lookup the user by email
+			const userLookupResponse = await axios.get(
+				"https://slack.com/api/users.lookupByEmail",
+				{
+					params: {
+						email: committerEmail,
+					},
+					headers: {
+						Authorization: `Bearer ${process.env.SLACK_BOT_KEY}`,
+					},
+				}
+			);
+
+			if (userLookupResponse.data.ok) {
+				const userId = userLookupResponse.data.user.id;
+
+				// Open a conversation with the user
+				const conversationResponse = await axios.post(
+					"https://slack.com/api/conversations.open",
+					{
+						users: userId,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${process.env.SLACK_BOT_KEY}`,
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				if (conversationResponse.data.ok) {
+					const channelId = conversationResponse.data.channel.id;
+
+					// Send message to the opened conversation
+					const messagePayload =
+						typeof comment === "string"
+							? {
+									channel: channelId,
+									text: comment,
+									as_user: true,
+							  }
+							: {
+									channel: channelId,
+									...comment,
+									as_user: true,
+							  };
+
+					const messageResponse = await axios.post(
+						"https://slack.com/api/chat.postMessage",
+						messagePayload,
+						{
+							headers: {
+								Authorization: `Bearer ${process.env.SLACK_BOT_KEY}`,
+								"Content-Type": "application/json",
+							},
+						}
+					);
+
+					if (messageResponse.data.ok) {
+						logger.info("Message sent successfully");
+					} else {
+						logger.error(
+							`Failed to send message: ${JSON.stringify(messageResponse.data)}`
+						);
+					}
+				} else {
+					logger.error(
+						`Failed to open conversation: ${JSON.stringify(
+							conversationResponse.data
+						)}`
+					);
+				}
+			} else {
+				logger.error(
+					`Failed to lookup user: ${JSON.stringify(userLookupResponse.data)}`
+				);
+			}
+		} catch (slackError) {
+			logger.error(
+				`Failed to interact with Slack: ${JSON.stringify(slackError)}`
+			);
+			throw slackError;
+		}
 	} catch (error) {
-		logger.error(`Failed to comment on PR: ${JSON.stringify(error)}`);
+		logger.error(`Failed to send message: ${JSON.stringify(error)}`);
 		throw error;
 	}
 };

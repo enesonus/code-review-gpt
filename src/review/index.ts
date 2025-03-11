@@ -31,6 +31,7 @@ export const review = async (
   const organization = yargs.org;
   const provider = yargs.provider;
   const reviewLanguage = yargs.reviewLanguage;
+  const reviewChannel = yargs.reviewChannel;
 
   const filteredFiles = filterFiles(files);
 
@@ -55,10 +56,12 @@ export const review = async (
     modelName,
     openAIApiKey,
     organization,
-    provider
+    provider,
+    reviewChannel
   );
 
   logger.debug(`Markdown report:\n${response}`);
+  await sendSlackMessage(response, signOff);
 
   if (isCi === PlatformOptions.GITHUB) {
     if (!shouldCommentPerFile) {
@@ -70,7 +73,6 @@ export const review = async (
   }
   if (isCi === PlatformOptions.GITLAB) {
     await commentOnPRGitlab(response, signOff);
-    await sendSlackMessage(response, signOff);
   }
 
   if (isCi === PlatformOptions.AZDEV) {
