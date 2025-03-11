@@ -40,7 +40,7 @@ export const sendSlackMessage = async (
 		const committerEmail = commitInfo.committer_email;
         
 		// Create commit URL
-		const commitUrl = `${gitlabHost}/${projectId}/-/commit/${gitlabSha}`;
+		const commitUrl = `${commitInfo.web_url}`;
         
 		// Add commit link to blocks if it's a blocks message
 		if (typeof comment === 'object' && comment.blocks) {
