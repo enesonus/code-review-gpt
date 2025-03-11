@@ -84,7 +84,7 @@ export const markdownReport = (
 			for (const feedback of feedbacks) {
 				// Add header for each feedback
 				blocks.push({
-					type: "header",
+					type: "section",
 					text: {
 						type: "plain_text",
 						text: `Risk Level ${feedback.riskScore} - ${feedback.fileName}`
