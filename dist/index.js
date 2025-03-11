@@ -40,7 +40,7 @@ ${Io(r.review)}
   ${r.map(mo).join(`
 ---
 `)}
-  `;case"slack":let o=[];for(let e of r)if(o.push({type:"section",text:{type:"plain_text",text:`Risk Level ${e.riskScore} - ${e.fileName}`}}),e.review.forEach((n,t)=>{o.push({type:"header",text:{type:"plain_text",text:`Comment ${t+1}`}});let u=[];if(u.push(n.reasoning),n.suggestedChanges)u.push(`*Suggested changes*
+  `;case"slack":let o=[];for(let e of r)if(o.push({type:"section",text:{type:"mrkdwn",text:`*Risk Level ${e.riskScore} - ${e.fileName}*`}}),e.review.forEach((n,t)=>{o.push({type:"header",text:{type:"plain_text",text:`Comment ${t+1}`}});let u=[];if(u.push(n.reasoning),n.suggestedChanges)u.push(`*Suggested changes*
 \`\`\`
 ${n.suggestedChanges}
 \`\`\``);if(u.push(`*Original Code*

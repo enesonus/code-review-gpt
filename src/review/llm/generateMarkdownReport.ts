@@ -86,8 +86,8 @@ export const markdownReport = (
 				blocks.push({
 					type: "section",
 					text: {
-						type: "plain_text",
-						text: `Risk Level ${feedback.riskScore} - ${feedback.fileName}`
+						type: "mrkdwn",
+						text: `*Risk Level ${feedback.riskScore} - ${feedback.fileName}*`
 					}
 				});
 
